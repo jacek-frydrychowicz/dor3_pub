@@ -13,7 +13,7 @@ pipeline {
         }
         stage('Test') {
             steps {
-                sh 'mvn test'
+                sh 'mvn -f cicd/java-app/pom.xml test'
             }
             post {
                 always {
