@@ -13,8 +13,8 @@ pipeline {
   stages {
     stage('Maven Package') {
       steps {
-        dir('java-app'){
-          sh 'mvn -f cicd/java-app/pom.xml package'
+        dir('cicd/java-app'){
+          sh 'mvn package'
         }
       }
     }
