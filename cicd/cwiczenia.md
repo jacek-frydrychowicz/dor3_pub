@@ -58,7 +58,7 @@ W przypadku problemów z powyższą komendą lub z pluginem vagrant-share zdefin
 `ngrok http 8081`  
 ngrok wyświetli publiczny adres URL działającego na localhost:8081 Jenkinsa  
 
-Wykonaj fork repozytorium i utwórz branch github-integration
+Stwórz nowe repozytorium i utwórz branch github-integration
 
 W Github przejdź do Settings (Settings danego repozytorium, nie profilu)> Webhooks > Add webhook i w polu Payload URL podaj adres wygenerowany przez komendę vagrant/ngrok i doklejając na końcu „/github-webhook/”. Np.: https://8fe3-46-204-72-20.eu.ngrok.io/github-webhook/  
 Następnie kliknij Add webhook. Do poprawnego zadziałania webhooka repozytorium musi być publiczne (rekomendowane na potrzeby wasztatów)  
@@ -117,7 +117,7 @@ Usage: Only build jobs with label expressions matching this node
 Launch method: Launch agent via SSH  
 Host: 10.0.0.20  
 
-W sekcji credentials kliknij Add > SSH Username with private key, podaj nazwę użytkownika (jenkins) oraz utworzony poprzednio klucz prywatny.  
+W sekcji credentials kliknij Add > Jenkins (credential provider) > SSH Username with private key, podaj nazwę użytkownika (jenkins) oraz utworzony poprzednio klucz prywatny.  
 Host key verification strategy: Manually trusted key verification strategy  
 Zaznacz checkbox: Require manual verification of initial connection  
 
@@ -150,7 +150,7 @@ Utwórz Pipeline który:
 - Zainstaluje maven w konkretnej wersji
 - Wyczyści workspace od razu po uruchomieniu
 - W stage build utworzy plik z aktualną datą z rozszerzeniem txt, a następnie w razie
-powodzenia zarchiwizuje plik
+powodzenia zarchiwizuje plik (opublikuje artefakt)
 - W stage validation zapyta użytkownika czy kontynuować
 - W stage deploy wyświetli wersję javy, a następnie nodejs, a w przypadku niepowodzenia zwróci komunikat
 „error!”
@@ -160,7 +160,7 @@ Cel: Uruchomienie aplikacji na agencie w kontenerze
 
 Konfiguracja:  
 Zainstaluj dockera na maszynie node i dodaj użytkownika jenkins do grupy docker: `sudo usermod -aG docker jenkins` (Można np. użyć części skryptu provision.sh lub pliku provision-node-docker.sh, dodać krok do pliku Vagrant i vagrant reload --provision)  
-Zainstaluj 2 pluginy w Jenkinsie: Docker plugin i Docker.  
+Zainstaluj 2 pluginy w Jenkinsie: Docker plugin i Docker Pipeline.  
 Zrestartuj maszyny node i jenkinsa
 
 Uruchomienie w kontenerze  
@@ -168,13 +168,26 @@ Na podstawie poprzednich ćwiczeń stwórz pipeline dla aplikacji Java, który:
 - Uruchomi pipeline w kontenerze (przykład: image 'maven:3.6.1-alpine')
 - Będzie zawierał stage: Build, Test, Deliver, Run, gdzie odpowiednio zbuduje paczkę, uruchomi testy i opublikuje ich rezultat, opublikuje artefakt i uruchomi aplikację
 
+## 07 - Pomoc i podpowiedź do kolejnych ćwiczeń
+
+**Jankins snippet generator**  
+Pomocne, ale pokaże tylko zainstalowane pluginy  
+<Jenkins_url>/pipeline-syntax  
+https://www.jenkins.io/doc/book/pipeline/getting-started/#snippet-generator
+
 ## 08 - Python
 Cel: Uruchomienie aplikacji python w kontenerze na agencie
 
 Wykonaj pipeline który uruchomi kontener z pythonem na maszynie node.  
 Folder w repo python-app
 
-W kontenerze muszą zostać zainstalowane zależności, a następnie aplikacja musi być uruchomiona.  
+W kontenerze muszą zostać zainstalowane zależności, a następnie aplikacja musi być uruchomiona. 
+Podpowiedź:
+```
+pip install -r requirements.txt
+python3 -m flask run --host=0.0.0.0 &
+```
+
 W kolejnym etapie (test) zweryfikuj działanie aplikacji komendą wget.
 
 ## 09 - Python - budowanie obrazów docker
@@ -186,7 +199,9 @@ Następnie opublikuje plik obrazu jako artefakt pipeline i wyczyści workspace
 ## 10 - Python - integracja z Dockerhub
 Cel: Zbudowanie obrazu Docker i opublikowanie do Dockerhub
 
-Wykonaj pipeline, który zbuduje obraz dockera na bazie Dockerfile.
-W Jenkins skonfiguruj credentials, które użyjesz do zalogowania do Dockerhub w pipelinie
+Wykonaj pipeline, który zbuduje obraz dockera na bazie Dockerfile.  
+W Jenkins skonfiguruj credentials, które użyjesz do zalogowania do Dockerhub w pipelinie  
 Następnie wrzuć zbudowany obraz do Dockerhub
 
+## 11 - Python - uruchomienie unit testów
+Korzystając z pliku test_app.py w folderze python-app i pipeline'u stworzonego w ćwiczeniu 08, dodaj stage, który uruchomi pythonowe unit testy (np. za pomocą pytest dodanym już do pliku requirements) i opublikuje rezultaty testów w formacie junit
